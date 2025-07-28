@@ -1,0 +1,170 @@
+/* Tiptap Editor Styles */
+.tiptap:first-child {
+  margin-top: 0;
+}
+
+/* List styles */
+.tiptap ul,
+.tiptap ol {
+  padding: 0 1rem;
+  margin: 1.25rem 1rem 1.25rem 0.4rem;
+}
+
+/* Bullet list styles */
+.tiptap ul {
+  list-style-type: disc;
+}
+
+.tiptap ul li {
+  margin: 0.5rem 0;
+}
+
+/* Ordered list styles */
+.tiptap ol {
+  list-style-type: decimal;
+}
+
+.tiptap ol li {
+  margin: 0.5rem 0;
+}
+
+.tiptap ul li p,
+.tiptap ol li p {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+/* Heading styles */
+.tiptap h1,
+.tiptap h2,
+.tiptap h3,
+.tiptap h4,
+.tiptap h5,
+.tiptap h6 {
+  line-height: 1.1;
+  margin-top: 2.5rem;
+  text-wrap: pretty;
+}
+
+.tiptap h1,
+.tiptap h2 {
+  margin-top: 3.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tiptap h1 {
+  font-size: 1.4rem;
+}
+
+.tiptap h2 {
+  font-size: 1.2rem;
+}
+
+.tiptap h3 {
+  font-size: 1.1rem;
+}
+
+.tiptap h4,
+.tiptap h5,
+.tiptap h6 {
+  font-size: 1rem;
+}
+
+/* Code and preformatted text styles */
+.tiptap code {
+  background-color: #f3f4f6;
+  border-radius: 0.4rem;
+  color: #1f2937;
+  font-size: 0.85rem;
+  padding: 0.25em 0.3em;
+}
+
+.tiptap pre {
+  background: #1f2937;
+  border-radius: 0.5rem;
+  color: #f9fafb;
+  font-family: 'JetBrainsMono', monospace;
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+}
+
+.tiptap pre code {
+  background: none;
+  color: inherit;
+  font-size: 0.8rem;
+  padding: 0;
+}
+
+.tiptap blockquote {
+  border-left: 3px solid #d1d5db;
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  color: #6b7280;
+}
+
+.tiptap hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2rem 0;
+}
+
+/* Paragraph styles - 기본 줄간격을 줄임 */
+.tiptap p {
+  margin: 0;
+  line-height: 1.15;
+}
+
+/* Line height options */
+.tiptap.line-height-115 p {
+    line-height: 1.15;
+}
+
+.tiptap.line-height-15 p {
+    line-height: 1.5;
+}
+
+.tiptap.line-height-2 p {
+    line-height: 2;
+}
+
+/* Text alignment styles */
+.tiptap [style*="text-align: left"] {
+  text-align: left;
+}
+
+.tiptap [style*="text-align: center"] {
+  text-align: center;
+}
+
+.tiptap [style*="text-align: right"] {
+  text-align: right;
+}
+
+.tiptap [style*="text-align: justify"] {
+  text-align: justify;
+}
+
+/* Font size styles */
+.tiptap [style*="font-size"] {
+  line-height: 1.4;
+}
+
+/* Focus styles */
+.tiptap:focus {
+  outline: none;
+}
+
+/* Selection styles */
+.tiptap::selection {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* Placeholder styles */
+.tiptap p.is-editor-empty:first-child::before {
+  color: #9ca3af;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+} 
