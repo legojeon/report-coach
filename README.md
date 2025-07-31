@@ -1,24 +1,76 @@
-# ReportCoach
+# ReportCoach: AI 기반 리포트 작성 및 분석 플랫폼
 
-ReportCoach는 AI 기반 리포트 작성 및 분석 도구입니다. 사용자가 문서를 업로드하고 AI와 대화하며 리포트를 작성하고 분석할 수 있는 웹 애플리케이션입니다.
+ReportCoach는 과학전람회 보고서 데이터로 구축된 벡터 DB를 기반으로, AI를 활용하여 리포트를 검색, 분석하고 작성을 돕는 웹 애플리케이션입니다.
 
-## 🚀 주요 기능
+사용자는 AI와의 상호작용을 통해 아이디어를 발전시키고 완성도 높은 결과물을 만들 수 있습니다.
+
+이 서비스는 2011년 이후 과학전람회 보고서 전체 데이터를 벡터화(embedding)해 구축한 DB를 기반으로 동작합니다.
+
+서비스 바로가기: [rc.coco.io.kr](http://rc.coco.io.kr)
+
+---
+
+## 🌟 주요 기능
 
 ### 📝 리포트 작성 및 분석
-- **AI 채팅**: 문서 내용에 대한 질문과 답변
-- **리포트 작성**: AI 도움을 받아 리포트 작성
-- **문서 검색**: 업로드된 문서에서 정보 검색
-- **노트 작성**: 중요 내용을 노트로 저장
+- **AI 채팅**: 문서 내용에 기반한 심층적인 질의응답이 가능합니다.
+- **리포트 작성**: AI의 가이드를 받으며 단계별로 리포트를 완성할 수 있습니다.
+- **리포트 검색**: 질문을 기반으로 가장 관련도 높은 보고서를 찾아주고, 여러 보고서의 내용을 종합하여 요약 설명해줍니다.
+- **RAG 기반 검색**: [과학전람회 보고서 사이트](https://www.science.go.kr/mps/1079/bbs/423/moveBbsNttList.do)에 공개된 **2011년 이후 모든 보고서 데이터를 벡터 DB(ChromaDB)에 임베딩**하고, LangChain을 활용해 검색-증강-생성(Search-Augmented Generation) 방식을 구현했습니다.
+- **노트 작성**: 분석 중 발견한 중요한 내용 혹은 작성중인 보고서를 노트로 저장하고 관리합니다.
 
-### 📊 문서 관리
-- **PDF 뷰어**: 내장 PDF 뷰어로 문서 확인
-- **문서 업로드**: PDF 파일 업로드 및 처리
-- **문서 분석**: AI를 통한 문서 내용 분석
+### 📊 문서 및 사용자 관리
+- **PDF 뷰어**: 웹에서 바로 문서를 확인하고 분석할 수 있습니다.
+- **안전한 사용자 인증**: JWT 토큰 기반의 안정적인 회원가입 및 로그인 시스템을 제공합니다.
+- **프로필 및 계획 관리**: 사용자 정보를 관리하고 리포트 작성 계획을 체계적으로 수립합니다
 
-### 👤 사용자 관리
-- **회원가입/로그인**: 사용자 인증 시스템
-- **프로필 관리**: 사용자 정보 및 설정 관리
-- **계획 관리**: 리포트 작성 계획 수립
+---
+
+## 🖼️ 실행 화면
+
+<div align="center">
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/legojeon/report-coach/blob/main/screen_shot/main_page.png" width="400px"/><br>
+      <b>메인 페이지</b><br>
+      사이트 접속 초기 화면
+    </td>
+    <td align="center">
+      <img src="https://github.com/legojeon/report-coach/blob/main/screen_shot/search_page.png" width="400px"/><br>
+      <b>검색 화면</b><br>
+      벡터DB 기반 검색 결과
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/legojeon/report-coach/blob/main/screen_shot/report_page.png" width="400px"/><br>
+      <b>보고서 분석 화면</b><br>
+      AI와 질의응답하며 보고서 분석
+    </td>
+    <td align="center">
+      <img src="https://github.com/legojeon/report-coach/blob/main/screen_shot/write_page.png" width="400px"/><br>
+      <b>보고서 작성 화면</b><br>
+      AI 가이드와 함께 보고서 작성
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/legojeon/report-coach/blob/main/screen_shot/note_page.png" width="400px"/><br>
+      <b>노트 페이지</b><br>
+      저장된 보고서 및 대화 내역 조회
+    </td>
+    <td align="center">
+      <img src="https://github.com/legojeon/report-coach/blob/main/screen_shot/plan_page.png" width="400px"/><br>
+      <b>멤버십 페이지</b><br>
+      플랜 구독 및 해지
+    </td>
+  </tr>
+</table>
+
+</div>
+
 
 ## 🛠️ 기술 스택
 
@@ -37,6 +89,14 @@ ReportCoach는 AI 기반 리포트 작성 및 분석 도구입니다. 사용자�
 - **TipTap**: 리치 텍스트 에디터
 - **React Router**: 라우팅
 - **Axios**: HTTP 클라이언트
+
+### 🛠️ Vector DB & RAG Architecture
+- [과학전람회 보고서 사이트](https://www.science.go.kr/mps/1079/bbs/423/moveBbsNttList.do)에서 **2011년 이후 모든 보고서 메타데이터 및 PDF를 수집**
+- 보고서 본문을 **문단 단위로 쪼개고 임베딩(embedding)하여 ChromaDB에 저장**
+- **LangChain**을 통해 벡터 검색과 문서 retrieval 파이프라인 구성
+- **Google GenAI** 모델이 검색된 문서를 기반으로 자연스러운 답변을 생성 (RAG pipeline)
+
+---
 
 ## 📁 프로젝트 구조
 
@@ -59,6 +119,8 @@ report-app/
 │   └── public/             # 정적 파일
 └── docker-compose.yml      # Docker 설정
 ```
+
+---
 
 ## 🚀 설치 및 실행
 
@@ -137,63 +199,8 @@ npm run dev
 docker-compose up --build
 ```
 
-## 📖 사용법
+---
 
-### 1. 회원가입/로그인
-- 웹 애플리케이션에 접속하여 계정 생성
-- 로그인 후 대시보드 접근
-
-### 2. 문서 업로드
-- PDF 파일을 업로드하여 문서 관리
-- 업로드된 문서는 자동으로 분석됨
-
-### 3. AI 채팅
-- 문서에 대한 질문을 AI에게 물어보기
-- 실시간으로 답변 받기
-
-### 4. 리포트 작성
-- AI 도움을 받아 리포트 작성
-- TipTap 에디터를 사용한 리치 텍스트 편집
-
-### 5. 노트 관리
-- 중요 내용을 노트로 저장
-- 노트 검색 및 관리
-
-## 🔧 환경변수
-
-### Backend (.env)
-```env
-# Supabase 설정
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_key
-
-# Google GenAI 설정
-GOOGLE_GENAI_API_KEY=your_google_genai_key
-
-# 서버 설정
-BACKEND_PORT=5000
-```
-
-### Frontend (.env)
-```env
-# API 설정
-VITE_API_URL=http://localhost:5000
-```
-
-## 🐳 Docker 배포
-
-### Docker Compose로 실행
-```bash
-docker-compose up --build
-```
-
-### 개별 컨테이너 실행
-```bash
-# Backend
-docker build -t reportcoach-backend ./backend
-docker run -p 5000:5000 reportcoach-backend
-
-# Frontend
-docker build -t reportcoach-frontend ./frontend
-docker run -p 3000:3000 reportcoach-frontend
-```
+## 📄 참고 자료
+- **[backend 디렉토리](https://github.com/legojeon/report-coach/tree/main/backend)** 에서 API 명세, 벡터 DB 구축 과정, 
+  과학전람회 보고서 크롤링 스크립트, 데이터 전처리 코드 등을 확인할 수 있습니다.
