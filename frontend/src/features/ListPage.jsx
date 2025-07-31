@@ -39,7 +39,7 @@ function ListPage() {
   const resultsPerPage = 10        // 페이지네이션 단위
   const searchResultCount = 50     // 검색 결과 개수
   const analysisResultCount = 5    // 분석 대상 개수
-  
+
   // 정렬 옵션 상태 추가
   const [sortOption, setSortOption] = useState('relevance') // 'relevance' 또는 'latest'
 
@@ -131,7 +131,6 @@ function ListPage() {
       let userData = null
       if (userResponse.ok) {
         userData = await userResponse.json()
-        console.log('사용자 is_membership:', userData.is_membership)
       }
 
       const response = await fetch(`${apiUrl}/search/search`, {
@@ -422,8 +421,8 @@ function ListPage() {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900">
-                검색 결과 ({searchResults.length}개)
-              </h3>
+              검색 결과 ({searchResults.length}개)
+            </h3>
               
               {/* 정렬 옵션 */}
               <div className="flex items-center space-x-4">

@@ -25,9 +25,14 @@ MANIFEST
 backend/venv/
 backend/env/
 backend/ENV/
+venv/
+env/
+ENV/
 
 # Data directories
 backend/datas/
+datas/
+data/
 
 # Database
 *.db
@@ -39,6 +44,16 @@ backend/datas/
 .env.development.local
 .env.test.local
 .env.production.local
+backend/.env
+backend/.env.local
+backend/.env.development.local
+backend/.env.test.local
+backend/.env.production.local
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
 # Node.js
 node_modules/
@@ -66,6 +81,8 @@ Thumbs.db
 
 # Logs
 *.log
+logs/
+nohup.out
 
 # Runtime data
 pids
@@ -95,4 +112,52 @@ jspm_packages/
 .yarn-integrity
 
 # dotenv environment variables file
-.env 
+.env
+
+# Additional important exclusions
+# PDF files (if they contain sensitive data)
+*.pdf
+
+# Large model files
+*.bin
+*.model
+*.pkl
+*.pickle
+
+# Cache directories
+.cache/
+__pycache__/
+.pytest_cache/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Scripts output
+scripts/logs/
+scripts/nohup.out
+
+# ChromaDB data (if using vector database)
+chroma_db/
+*.chroma
+
+# AI/ML model files
+models/
+*.h5
+*.pth
+*.pt
+*.onnx
+
+# Large data files
+*.csv
+*.json
+*.xml
+*.xlsx
+*.xls
+
+# Backup files
+*.bak
+*.backup
+*~ 

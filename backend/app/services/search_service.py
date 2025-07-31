@@ -30,22 +30,22 @@ def get_weight_config():
             1: float(os.getenv("SEARCH_SECTION_WEIGHT_2", "0.04")),  # 2순위
             2: float(os.getenv("SEARCH_SECTION_WEIGHT_3", "0.01"))   # 3순위
         },
-        "award_weights": {               # 수상도별 가중치 (높은 순위일수록 높은 가중치)
+    "award_weights": {               # 수상도별 가중치 (높은 순위일수록 높은 가중치)
             "대통령상": float(os.getenv("SEARCH_AWARD_PRESIDENT", "0.15")),
             "국무총리상": float(os.getenv("SEARCH_AWARD_PRIME_MINISTER", "0.12")),
             "최우수상": float(os.getenv("SEARCH_AWARD_EXCELLENT", "0.10")),
             "특상": float(os.getenv("SEARCH_AWARD_SPECIAL", "0.08")),
             "우수상": float(os.getenv("SEARCH_AWARD_GOOD", "0.06")),
             "장려상": float(os.getenv("SEARCH_AWARD_ENCOURAGEMENT", "0.04"))
-        },
-        "metadata_weights": {
+    },
+    "metadata_weights": {
             "field": float(os.getenv("SEARCH_METADATA_FIELD", "0.06")),      # 분야 매칭 가중치
             "year": float(os.getenv("SEARCH_METADATA_YEAR", "0.05")),        # 연도 매칭 가중치
             "award": float(os.getenv("SEARCH_METADATA_AWARD", "0.08")),      # 수상내역 매칭 가중치
             "authors": float(os.getenv("SEARCH_METADATA_AUTHORS", "0.1")),   # 저자 매칭 가중치
             "teacher": float(os.getenv("SEARCH_METADATA_TEACHER", "0.1"))    # 지도교사 매칭 가중치
-        }
     }
+}
 
 # 전역 가중치 설정 변수
 WEIGHT_CONFIG = get_weight_config()
@@ -69,7 +69,6 @@ def get_paths():
     """환경변수에서 경로 설정을 읽어와서 반환"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
     base_dir = os.path.dirname(os.path.dirname(current_dir))
-    
     return {
         "chroma_db": os.path.join(base_dir, os.getenv("CHROMA_DB_PATH", "datas/chroma_db")),
         "extracted_pdf": os.path.join(base_dir, os.getenv("EXTRACTED_PDF_PATH", "datas/extracted_pdf")),

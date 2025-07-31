@@ -34,7 +34,6 @@ function ProfilePage() {
     const fetchUser = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        console.log('로그인이 필요합니다.');
         localStorage.removeItem('token'); // 토큰 제거
         navigate('/');
         return;
@@ -47,7 +46,6 @@ function ProfilePage() {
           localStorage.removeItem('token');
           navigate('/');
         } else {
-          console.log('사용자 정보를 불러오지 못했습니다.');
           localStorage.removeItem('token'); // 에러 발생 시 토큰 제거
           navigate('/');
         }
@@ -93,7 +91,6 @@ function ProfilePage() {
       setShowDeleteModal(false);
       navigate('/');
     } catch (err) {
-      console.log('계정 삭제에 실패했습니다.');
       localStorage.removeItem('token'); // 에러 발생 시 토큰 제거
       navigate('/');
       setShowDeleteModal(false);

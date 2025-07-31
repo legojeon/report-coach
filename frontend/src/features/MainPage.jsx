@@ -153,7 +153,7 @@ function MainPage() {
                 다양한 형식
               </h4>
               <p className="text-gray-600 text-sm">
-                비즈니스 리포트, 분석 보고서, 요약 문서 등 원하는 형식으로 작성
+                분석 보고서, 요약 문서 등 원하는 형식으로 작성
               </p>
             </div>
           </div>
@@ -181,10 +181,10 @@ function MainPage() {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-900 mb-2">아두이노 활용 보고서</h4>
                   <div className="space-y-2 text-sm text-gray-600">
-                    <p>• 매출 현황 및 추이 분석</p>
-                    <p>• 주요 성과 지표 (KPI) 분석</p>
-                    <p>• 시장 동향 및 경쟁사 비교</p>
-                    <p>• 향후 전략 및 개선 방안</p>
+                    <p>• 보고서 내용 분석 및 요약</p>
+                    <p>• 데이터 분석/수집 방법</p>
+                    <p>• 탐구 과정 설명</p>
+                    <p>• 결론 분석 및 개선 방안</p>
                   </div>
                 </div>
               </div>

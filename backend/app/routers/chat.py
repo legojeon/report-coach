@@ -22,6 +22,7 @@ class ChatRequest(BaseModel):
     report_number: str
     history: Optional[List[ChatHistoryItem]] = None
     is_hidden: Optional[bool] = False
+    origin_query: Optional[str] = None
 
 class ChatResponse(BaseModel):
     response: str
@@ -60,13 +61,15 @@ async def chat_with_report(
                 })
         
         # Gemini API를 사용하여 채팅
+        # origin_query가 있으면 ChatService에 넘김
         result, usage_metadata = await ChatService.chat_with_gemini(
             report_number=request.report_number, 
             query=request.query,
             user_id=str(current_user.id),
             logger_service=logger_service,
             history=history_dict,
-            is_hidden=request.is_hidden
+            is_hidden=request.is_hidden,
+            origin_query=request.origin_query
         )
         
         return ChatResponse(
@@ -245,3 +248,27 @@ async def get_chat_history(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) 
+
+@router.get("/example/{question_number}")
+async def get_example_question(
+    question_number: int,
+    current_user = Depends(get_current_user)
+):
+    """예시 질문에 대한 프롬프트 반환"""
+    try:
+        # 프롬프트 파일 경로
+        from ..services.chat_service import PATHS
+        prompt_path = os.path.join(PATHS["prompts"], "example_questions", f"question_{question_number}.txt")
+        
+        if not os.path.exists(prompt_path):
+            raise HTTPException(status_code=404, detail="프롬프트 파일을 찾을 수 없습니다.")
+        
+        with open(prompt_path, 'r', encoding='utf-8') as f:
+            prompt_content = f.read()
+        
+        return {
+            "question_number": question_number,
+            "prompt": prompt_content
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"예시 질문 처리 중 오류가 발생했습니다: {str(e)}") 

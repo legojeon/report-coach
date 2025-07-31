@@ -14,7 +14,6 @@ def get_paths():
     """환경변수에서 경로 설정을 읽어와서 반환"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
     base_dir = os.path.dirname(os.path.dirname(current_dir))
-    
     return {
         "chroma_db": os.path.join(base_dir, os.getenv("CHROMA_DB_PATH", "datas/chroma_db")),
         "extracted_pdf": os.path.join(base_dir, os.getenv("EXTRACTED_PDF_PATH", "datas/extracted_pdf")),
@@ -104,7 +103,7 @@ class ChatService:
             return ""
 
     @staticmethod
-    async def chat_with_gemini(report_number: str, query: str, user_id: Optional[str] = None, logger_service: Optional[LoggerService] = None, session_id: Optional[str] = None, history: Optional[list] = None, is_hidden: bool = False):
+    async def chat_with_gemini(report_number: str, query: str, user_id: Optional[str] = None, logger_service: Optional[LoggerService] = None, session_id: Optional[str] = None, history: Optional[list] = None, is_hidden: bool = False, origin_query: Optional[str] = None):
         model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash-001")
         print(f"[CHAT] 모델: {model_name}")
         print(f"[CHAT] report_number: {report_number}")
@@ -175,7 +174,7 @@ class ChatService:
                     await logger_service.log_ai_usage(
                         user_id=user_id,
                         service_name="chat_report",
-                        request_prompt=query,
+                        request_prompt=origin_query if origin_query is not None else query,
                         request_token_count=usage_metadata.get('prompt_token_count', 0),
                         response_token_count=usage_metadata.get('candidates_token_count', 0),
                         total_token_count=usage_metadata.get('total_token_count', 0),

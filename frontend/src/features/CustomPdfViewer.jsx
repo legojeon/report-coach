@@ -101,7 +101,6 @@ function CustomPdfViewer({ url, height = 'calc(100%)', isSummary, onToggleSummar
       
       // URL이 null이거나 빈 문자열인 경우 처리하지 않음
       if (!url) {
-        console.log('PDF URL이 없습니다:', url);
         setPdf(null);
         setNumPages(0);
         setLoadError(true);
@@ -110,10 +109,8 @@ function CustomPdfViewer({ url, height = 'calc(100%)', isSummary, onToggleSummar
       }
       
       try {
-        console.log('PDF 로드 시작:', url);
         const loadingTask = pdfjsLib.getDocument(url);
         const loadedPdf = await loadingTask.promise;
-        console.log('PDF 로드 성공:', loadedPdf.numPages, '페이지');
         setPdf(loadedPdf);
         setNumPages(loadedPdf.numPages);
         setCurrentPage(1); // PDF 로드 시 첫 페이지로 리셋
@@ -123,13 +120,8 @@ function CustomPdfViewer({ url, height = 'calc(100%)', isSummary, onToggleSummar
                          (error.message && error.message.includes('Invalid PDF structure'));
         
         if (isHwpFile) {
-          console.log('HWP 파일입니다. 지원되지 않는 형식입니다.');
           setErrorMessage('보고서 파일 형식이 맞지 않습니다');
         } else {
-          console.error('PDF 로드 오류:', error);
-          console.error('PDF URL:', url);
-          console.error('오류 타입:', error.name);
-          console.error('오류 메시지:', error.message);
           setErrorMessage('보고서 파일이 존재하지 않습니다');
         }
         

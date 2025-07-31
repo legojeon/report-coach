@@ -2,22 +2,15 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import api_router
 import os
+import time
+from datetime import datetime
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-# 개발/운영 환경 구분
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
-if ENVIRONMENT == "development":
-    # 개발 환경 설정
-    origins = [
-        "http://localhost:5173"
-    ]
-    # 정적 파일 서빙 제거
-else:
-    # 운영 환경 설정 (도커)
-    origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
-    # 정적 파일 서빙 활성화
+origins = [
+    "http://localhost:5173"
+]
 
 app = FastAPI(
     title="ReportCoach API",
@@ -35,27 +28,40 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
-# API 라우터 등록
+# API 라우터 등록 (정적 파일보다 먼저)
 app.include_router(api_router, prefix="/api/v1")
 
-# # ✅ 도커 기준 dist 경로로 정적 파일 mount
-# DIST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../frontend/dist"))
-# print("📦 Serving static files from:", DIST_PATH)
-# app.mount("/", StaticFiles(directory=DIST_PATH, html=True), name="static")
-
-# @app.exception_handler(404)
-# async def spa_fallback(request: Request, exc):
-#     return FileResponse(os.path.join(DIST_PATH, "index.html"))
-
-@app.get("/")
-async def root():
-    return {"message": "ReportCoach API is running!"}
-
+# API 엔드포인트들 (정적 파일보다 먼저)
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    """서버 상태 체크 API"""
+    try:
+        # 기본 정보
+        health_info = {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "service": "ReportCoach",
+            "version": "1.0.0",
+        }
+        return health_info
+        
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
+
+# 정적 파일 마운트 (API 라우트 이후에)
+DIST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../frontend/dist"))
+print("📦 Serving static files from:", DIST_PATH)
+app.mount("/", StaticFiles(directory=DIST_PATH, html=True), name="static")
+
+@app.exception_handler(404)
+async def spa_fallback(request: Request, exc):
+    return FileResponse(os.path.join(DIST_PATH, "index.html"))
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("BACKEND_PORT", "8000"))
+    port = int(os.getenv("BACKEND_PORT", "5000"))
     uvicorn.run("main:app", host="0.0.0.0", port=port) 

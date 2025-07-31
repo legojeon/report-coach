@@ -96,7 +96,6 @@ const ChatPage = () => {
           if (userResponse.ok) {
             const userData = await userResponse.json();
             setUserData(userData);
-            console.log('사용자 is_membership:', userData.is_membership);
           }
         } catch (error) {
           console.error('사용자 데이터 가져오기 오류:', error);
@@ -259,7 +258,6 @@ const ChatPage = () => {
   // 채팅 전송 핸들러 (context caching 활용)
   const handleSend = async () => {
     if (!input.trim() || !reportData) {
-      console.log('채팅 전송 조건 미충족:', { input: input.trim(), reportData: !!reportData });
       return;
     }
     
@@ -280,7 +278,6 @@ const ChatPage = () => {
     }
     
     try {
-      console.log('채팅 요청 전송 (context caching 활용):', { report_number: reportData.number, query: userInput });
       const token = localStorage.getItem('token');
       // session_id 생성: userData.id + reportData.number
       let session_id = undefined;
@@ -322,7 +319,7 @@ const ChatPage = () => {
       
       // 사용량 메타데이터가 있으면 로그 출력
       if (data.usage_metadata) {
-        console.log('채팅 사용량 메타데이터:', data.usage_metadata);
+        // 사용량 메타데이터 처리
       }
     } catch (error) {
       console.error('채팅 오류:', error);
@@ -354,6 +351,100 @@ const ChatPage = () => {
 
   const handleMyNotesClick = () => {
     navigate('/notes');
+  };
+
+  // 예시 질문 핸들러
+  const handleExampleQuestion = async (questionNumber) => {
+    // 버튼별 실제 표시 텍스트
+    const questionTexts = {
+      1: '보고서 한 문장으로 요약해줘',
+      2: '탐구 동기가 뭐야?',
+      3: '핵심 질문 뽑아줘',
+      4: '탐구 과정 설명',
+      5: '활용된 준비물이나 프로그램',
+      6: '데이터 분석/수집 방법',
+      7: '탐구 과정에서 어려웠던 점',
+      8: '코딩을 적용한다면?',
+      9: '인공지능을 활용한다면?',
+      10: '결론이 갖는 의미',
+      11: '이 탐구를 통해 새롭게 알게된 점',
+      12: '이 탐구보고서 활용법'
+    };
+    const userText = questionTexts[questionNumber] || '';
+    if (!userText || !reportData) return;
+
+    // Pro 멤버십 체크
+    if (userData && !userData.is_membership) {
+      setMessages(msgs => [...msgs, {
+        role: 'user', text: userText
+      }, {
+        role: 'assistant',
+        text: '이 기능은 Pro 멤버십 회원만 이용할 수 있습니다. Pro 멤버십으로 업그레이드하여 AI 채팅 기능을 이용해보세요!'
+      }]);
+      return;
+    }
+
+    setIsLoading(true);
+    setMessages(msgs => [...msgs, { role: 'user', text: userText }]);
+
+    try {
+      const token = localStorage.getItem('token');
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      // prompt_temp.txt 내용 가져오기
+      const promptRes = await fetch(`${apiUrl}/chat/example/${questionNumber}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!promptRes.ok) throw new Error('예시 프롬프트를 가져오지 못했습니다.');
+      const promptData = await promptRes.json();
+      const prompt = promptData.prompt;
+
+      // 히스토리를 올바른 형식으로 변환 (userText가 이미 추가된 상태)
+      const newMessages = [...messages, { role: 'user', text: userText }];
+      const history = newMessages.map(msg => ({
+        role: msg.role === 'assistant' ? 'model' : msg.role,
+        parts: [{ text: msg.text }]
+      }));
+
+      // session_id 생성
+      let session_id = undefined;
+      if (userData && userData.id && reportData && reportData.number) {
+        session_id = `${userData.id}_${reportData.number}`;
+      }
+
+      const requestBody = {
+        query: prompt,
+        report_number: reportData.number.toString(),
+        history: history,
+        ...(session_id ? { session_id } : {}),
+        origin_query: userText
+      };
+
+      const response = await fetch(`${apiUrl}/chat/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`채팅 요청에 실패했습니다. (${response.status}) ${errorText}`);
+      }
+
+      const data = await response.json();
+      setMessages(msgs => [...msgs, { role: 'assistant', text: data.response }]);
+      if (data.usage_metadata) {
+        // 사용량 메타데이터 처리
+      }
+    } catch (error) {
+      setMessages(msgs => [...msgs, { role: 'assistant', text: '분석 중 오류가 발생했습니다.' }]);
+      console.error('예시 질문 채팅 오류:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 노트에 저장 버튼 클릭 핸들러
@@ -392,7 +483,6 @@ const ChatPage = () => {
       
       if (!summaryResponse.ok) throw new Error('요약 요청 실패');
       const summaryData = await summaryResponse.json();
-      console.log('노트에 저장(요약) 결과:', summaryData);
       
       // 2. 노트에 저장 요청 (업데이트/생성)
       // 메시지를 올바른 형태로 변환
@@ -523,6 +613,87 @@ const ChatPage = () => {
                 </div>
               </div>
             )}
+            
+            {/* 예시 질문들 */}
+            <div className="space-y-4 mb-6">
+              <div className="p-4">
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">예시 질문</h3>
+                <div className="grid grid-cols-4 gap-2">
+                  <button
+                    onClick={() => handleExampleQuestion(1)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    1. 보고서 한 문장으로 요약해줘
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(2)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    2. 탐구 동기가 뭐야?
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(3)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    3. 핵심 질문 뽑아줘
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(4)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    4. 탐구 과정 설명
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(5)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    5. 활용된 준비물이나 프로그램
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(6)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    6. 데이터 분석/수집 방법
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(7)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    7. 탐구 과정에서 어려웠던 점
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(8)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    8. 코딩을 적용한다면?
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(9)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    9. 인공지능을 활용한다면?
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(10)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    10. 결론이 갖는 의미
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(11)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    11. 이 탐구를 통해 새롭게 알게된 점
+                  </button>
+                  <button
+                    onClick={() => handleExampleQuestion(12)}
+                    className="text-left p-2 rounded border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors text-xs text-gray-700"
+                  >
+                    12. 이 탐구보고서 활용법
+                  </button>
+                </div>
+              </div>
+            </div>
             
             {/* 채팅 메시지 렌더링 */}
             <div className="space-y-4">

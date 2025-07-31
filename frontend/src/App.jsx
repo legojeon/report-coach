@@ -8,6 +8,7 @@ import ListPage from './features/ListPage'
 import ChatPage from './features/ChatPage'
 import WritePage from './features/WritePage'
 import NotePage from './features/NotePage'
+import HealthPage from './features/HealthPage'
 import './App.css'
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/write" element={<WritePage />} />
         <Route path="/notes" element={<NotePage />} />
+        <Route path="/health" element={<HealthPage />} />
       </Routes>
     </BrowserRouter>
   )

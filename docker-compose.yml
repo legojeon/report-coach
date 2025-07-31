@@ -1,0 +1,44 @@
+# docker-compose.yml
+
+# 실행하려는 서비스(컨테이너)들의 묶음
+services:
+  # 서비스의 이름 (원하는 대로 지정 가능)
+  app:
+    # 실행될 컨테이너의 이름 설정
+    container_name: report-app-container
+    
+    # 도커 이미지를 빌드하는 설정
+    # build: . 은 현재 디렉토리의 Dockerfile을 사용하라는 의미
+    build: .
+    
+    # 호스트와 컨테이너의 포트 매핑 (호스트:컨테이너)
+    ports:
+      - "20010:5000" # 호스트 20010번 포트를 컨테이너 5000번 포트로 연결
+      
+    # 환경 변수 파일을 지정
+    env_file:
+      - backend/.env
+    
+    # 볼륨 마운트 (데이터베이스 및 파일 접근)
+    volumes:
+      - ./backend/datas:/app/backend/datas
+      - ./backend/prompts:/app/backend/prompts
+    
+    # GPU 설정
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    
+    # 컨테이너 재시작 정책
+    restart: unless-stopped
+    
+    # 로그 설정
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3" 
