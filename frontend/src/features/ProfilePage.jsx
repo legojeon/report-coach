@@ -20,6 +20,7 @@ function ProfilePage() {
   const [userHistory, setUserHistory] = useState(null);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyType, setHistoryType] = useState('all'); // 'all', 'search', 'chat'
+  const [showContactModal, setShowContactModal] = useState(false);
   const navigate = useNavigate();
 
   // Bootstrap SVG 아이콘
@@ -194,8 +195,8 @@ function ProfilePage() {
             <div className="text-neutral-400 text-xs">{user.affiliation || '소속 없음'}</div>
           </div>
           <div className="flex flex-col gap-2">
-            <button className="px-3 py-1.5 rounded border border-primary-600 text-primary-400 hover:bg-primary-900/30 text-xs">사용자 이름 변경</button>
-            <button className="px-3 py-1.5 rounded border border-primary-600 text-primary-400 hover:bg-primary-900/30 text-xs">소속 변경</button>
+            {/* <button className="px-3 py-1.5 rounded border border-primary-600 text-primary-400 hover:bg-primary-900/30 text-xs">사용자 이름 변경</button> */}
+            {/* <button className="px-3 py-1.5 rounded border border-primary-600 text-primary-400 hover:bg-primary-900/30 text-xs">소속 변경</button> */}
           </div>
         </div>
       </div>
@@ -253,7 +254,7 @@ function ProfilePage() {
           </div>
 
           <div className="text-gray-900">지원</div>
-          <div className="flex justify-end"><button className="px-3 py-1.5 rounded border border-neutral-700 text-gray-900 hover:bg-neutral-800 text-xs">연락하기</button></div>
+          <div className="flex justify-end"><button onClick={() => setShowContactModal(true)} className="px-3 py-1.5 rounded border border-neutral-700 text-gray-900 hover:bg-neutral-800 text-xs">연락하기</button></div>
 
           <div className="text-gray-900">당신은 다음으로 로그인했습니다: <span className="text-primary-400">{user.username}</span></div>
           <div className="flex justify-end"><button onClick={handleLogout} className="px-3 py-1.5 rounded border border-neutral-700 text-gray-900 hover:bg-neutral-800 text-xs">로그아웃</button></div>
@@ -562,6 +563,26 @@ function ProfilePage() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 연락하기 모달 */}
+      {showContactModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4 text-center">문의하기</h3>
+            <p className="text-sm text-gray-600 mb-6 text-center">
+              legojeon@kaist.ac.kr로 문의주세요
+            </p>
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowContactModal(false)}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+              >
+                확인
+              </button>
+            </div>
           </div>
         </div>
       )}
