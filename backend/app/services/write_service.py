@@ -59,7 +59,8 @@ class WriteService:
         user_report: str,
         report_numbers: List[str],
         user_id: str,
-        logger_service: Optional[LoggerService] = None
+        logger_service: Optional[LoggerService] = None,
+        auth_token: Optional[str] = None
     ) -> Tuple[str, dict]:
         """사용자 보고서 내용을 참고하여 분석 및 답변 생성"""
         generation_config = {
@@ -117,7 +118,8 @@ class WriteService:
                         request_prompt=user_query,
                         request_token_count=usage_metadata.get('prompt_token_count', 0),
                         response_token_count=usage_metadata.get('candidates_token_count', 0),
-                        total_token_count=usage_metadata.get('total_token_count', 0)
+                        total_token_count=usage_metadata.get('total_token_count', 0),
+                        auth_token=auth_token  # 토큰 전달
                     )
                 except Exception as log_error:
                     print(f"❌ 로깅 중 오류: {log_error}")
@@ -132,7 +134,8 @@ class WriteService:
         user_id: str, 
         user_report: str = "",
         history: Optional[List[Dict[str, Any]]] = None,
-        logger_service: Optional[LoggerService] = None
+        logger_service: Optional[LoggerService] = None,
+        auth_token: Optional[str] = None
     ) -> Tuple[str, Dict[str, Any]]:
         """analyze_for_write()를 활용한 채팅 메시지에 대한 답변 생성"""
         try:
@@ -150,7 +153,8 @@ class WriteService:
                 k=5,  # 상위 5개 보고서 사용
                 user_id=user_id,
                 logger_service=logger_service,
-                is_hidden=True  # write_chat에서 호출하는 검색은 숨김 처리
+                is_hidden=True,  # write_chat에서 호출하는 검색은 숨김 처리
+                auth_token=auth_token  # 토큰 전달
             )
             
             if not search_result.get('results'):
@@ -166,7 +170,8 @@ class WriteService:
                 user_report=user_report,
                 report_numbers=report_numbers,
                 user_id=user_id,
-                logger_service=logger_service
+                logger_service=logger_service,
+                auth_token=auth_token  # 토큰 전달
             )
             
             # 4. 히스토리 관리

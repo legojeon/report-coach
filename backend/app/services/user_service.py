@@ -1,13 +1,13 @@
 from app.models.user import User
 from app.schemas.user import UserUpdate
-from app.supabase_client import supabase
+from app.supabase_client import get_client
 from typing import List, Optional
 import logging
 
 logger = logging.getLogger(__name__)
 
 class UserService:
-    async def get_all_users(self) -> List[User]:
+    async def get_all_users(self, auth_token: Optional[str] = None) -> List[User]:
         """모든 사용자 조회"""
         try:
             response = supabase.table("users").select("*").execute()

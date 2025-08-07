@@ -112,7 +112,7 @@ jspm_packages/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+.env 
 
 # Additional important exclusions
 # PDF files (if they contain sensitive data)

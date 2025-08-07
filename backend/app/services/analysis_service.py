@@ -30,7 +30,7 @@ class AnalysisService:
     """분석 관련 비즈니스 로직을 담당하는 서비스"""
     
     @staticmethod
-    async def generate_combined_answer(contents: List[str], report_numbers: List[str], user_query: str, user_id: str, logger_service: Optional[LoggerService] = None) -> Tuple[str, dict]:
+    async def generate_combined_answer(contents: List[str], report_numbers: List[str], user_query: str, user_id: str, logger_service: Optional[LoggerService] = None, auth_token: Optional[str] = None) -> Tuple[str, dict]:
         """Gemini API를 사용하여 여러 보고서 내용을 기반으로 통합 답변 생성"""
         generation_config = {
             "max_output_tokens": int(os.getenv("GEMINI_MAX_TOKENS", "2048")),
@@ -78,7 +78,8 @@ class AnalysisService:
                         request_prompt=user_query,
                         request_token_count=usage_metadata.get('prompt_token_count', 0),
                         response_token_count=usage_metadata.get('candidates_token_count', 0),
-                        total_token_count=usage_metadata.get('total_token_count', 0)
+                        total_token_count=usage_metadata.get('total_token_count', 0),
+                        auth_token=auth_token  # 토큰 전달
                     )
                 except Exception as log_error:
                     print(f"❌ 로깅 중 오류: {log_error}")
@@ -87,7 +88,7 @@ class AnalysisService:
             return f"응답 생성 실패: {e}", {}
 
     @staticmethod
-    async def analyze_combined_reports(report_numbers: List[str], original_query: str, user_id: Optional[str] = None, logger_service: Optional[LoggerService] = None) -> Tuple[str, dict]:
+    async def analyze_combined_reports(report_numbers: List[str], original_query: str, user_id: Optional[str] = None, logger_service: Optional[LoggerService] = None, auth_token: Optional[str] = None) -> Tuple[str, dict]:
         """주어진 보고서 번호들의 union.txt 파일을 읽어서 통합 분석 수행"""
         contents = []
 
@@ -113,17 +114,17 @@ class AnalysisService:
         if not contents:
             return "분석할 내용이 없습니다.", {}
 
-        answer, usage_metadata = await AnalysisService.generate_combined_answer(contents, report_numbers, original_query, user_id, logger_service)
+        answer, usage_metadata = await AnalysisService.generate_combined_answer(contents, report_numbers, original_query, user_id, logger_service, auth_token)
         return answer, usage_metadata
 
     @staticmethod
-    async def analyze_reports(query: str, report_numbers: List[str], user_id: Optional[str] = None, logger_service: Optional[LoggerService] = None) -> Tuple[str, dict]:
+    async def analyze_reports(query: str, report_numbers: List[str], user_id: Optional[str] = None, logger_service: Optional[LoggerService] = None, auth_token: Optional[str] = None) -> Tuple[str, dict]:
         """분석 메인 함수 - 보고서 번호 출력 후 분석 수행"""
         # 분석할 보고서 번호 출력
         print(f"📊 분석 대상 보고서: {', '.join(report_numbers)}")
         
         # 분석 수행
-        result, usage_metadata = await AnalysisService.analyze_combined_reports(report_numbers, query, user_id, logger_service)
+        result, usage_metadata = await AnalysisService.analyze_combined_reports(report_numbers, query, user_id, logger_service, auth_token)
         return result, usage_metadata
 
  

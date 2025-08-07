@@ -44,7 +44,8 @@ async def chat_with_write(
             user_id=str(current_user.id),
             user_report=request.user_report,  # 사용자 보고서 내용 전달
             history=request.history,  # 채팅 히스토리 전달
-            logger_service=logger_service
+            logger_service=logger_service,
+            auth_token=credentials.credentials  # 토큰 전달
         )
         
         return ChatResponse(

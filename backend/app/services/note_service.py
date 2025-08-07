@@ -2,7 +2,7 @@ import os
 import json
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-from app.supabase_client import supabase
+from app.supabase_client import get_client
 
 class NoteService:
     """노트 관련 비즈니스 로직을 담당하는 서비스"""
@@ -14,10 +14,14 @@ class NoteService:
         title: Optional[str] = None,
         service_name: str = "chat_report",
         chat_history: Optional[List[Dict[str, str]]] = None,
-        chat_summary: Optional[str] = None
+        chat_summary: Optional[str] = None,
+        auth_token: Optional[str] = None
     ) -> Dict[str, Any]:
         """새 노트 생성"""
         try:
+            # 독립적인 클라이언트 사용
+            supabase = get_client(auth_token)
+            
             # chat_history를 JSON 문자열로 변환
             chat_history_json = json.dumps(chat_history or [], ensure_ascii=False) if chat_history else "[]"
             
@@ -47,9 +51,12 @@ class NoteService:
             return None
     
     @staticmethod
-    async def get_notes_by_user(user_id: str) -> List[Dict[str, Any]]:
+    async def get_notes_by_user(user_id: str, auth_token: Optional[str] = None) -> List[Dict[str, Any]]:
         """사용자의 모든 노트 조회"""
         try:
+            # 독립적인 클라이언트 사용
+            supabase = get_client(auth_token)
+            
             response = supabase.table("notes").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
             
             if response.data:
@@ -64,9 +71,12 @@ class NoteService:
             return []
     
     @staticmethod
-    async def get_notes_by_report(user_id: str, nttsn: Optional[int] = None) -> List[Dict[str, Any]]:
+    async def get_notes_by_report(user_id: str, nttsn: Optional[int] = None, auth_token: Optional[str] = None) -> List[Dict[str, Any]]:
         """특정 보고서의 노트 조회"""
         try:
+            # 독립적인 클라이언트 사용
+            supabase = get_client(auth_token)
+            
             if nttsn is None:
                 # nttsn이 null인 경우 (write_report 등)
                 response = supabase.table("notes").select("*").eq("user_id", user_id).is_("nttsn", "null").order("created_at", desc=True).execute()
@@ -85,9 +95,12 @@ class NoteService:
             return []
     
     @staticmethod
-    async def get_note_by_id(user_id: str, note_id: str) -> Optional[Dict[str, Any]]:
+    async def get_note_by_id(user_id: str, note_id: str, auth_token: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """특정 노트 조회"""
         try:
+            # 독립적인 클라이언트 사용
+            supabase = get_client(auth_token)
+            
             response = supabase.table("notes").select("*").eq("id", note_id).eq("user_id", user_id).execute()
             
             if response.data:
@@ -109,10 +122,14 @@ class NoteService:
         service_name: str = "chat_report",
         chat_history: Optional[List[Dict[str, str]]] = None,
         chat_summary: Optional[str] = None,
-        id: Optional[str] = None
+        id: Optional[str] = None,
+        auth_token: Optional[str] = None
     ) -> Dict[str, Any]:
         """노트 업데이트 또는 생성 (같은 nttsn과 user_id가 있으면 업데이트)"""
         try:
+            # 독립적인 클라이언트 사용
+            supabase = get_client(auth_token)
+            
             # chat_history를 JSON 문자열로 변환
             chat_history_json = json.dumps(chat_history or [], ensure_ascii=False) if chat_history else "[]"
 
@@ -214,8 +231,11 @@ class NoteService:
             return None 
 
     @staticmethod
-    async def update_note_is_active(note_id: str, user_id: str, is_active: bool):
+    async def update_note_is_active(note_id: str, user_id: str, is_active: bool, auth_token: Optional[str] = None):
         try:
+            # 독립적인 클라이언트 사용
+            supabase = get_client(auth_token)
+            
             response = supabase.table("notes").update({"is_active": is_active}).eq("id", note_id).eq("user_id", user_id).execute()
             if response.data:
                 return response.data[0]

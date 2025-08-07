@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import FileResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import List, Dict, Any
 import os
 from ..schemas.search import SearchRequest, SearchResponse
@@ -8,13 +9,14 @@ from ..services.analysis_service import AnalysisService
 from ..services.logger_service import LoggerService
 from app.dependencies import get_current_user
 
-
+security = HTTPBearer()
 router = APIRouter()
 
 @router.post("/search", response_model=SearchResponse)
 async def search_documents(
     request: SearchRequest,
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """문서 검색 API - 인증된 사용자만 사용 가능"""
     try:
@@ -25,7 +27,8 @@ async def search_documents(
             query=request.query, 
             k=request.k, 
             user_id=str(current_user.id),
-            logger_service=logger_service
+            logger_service=logger_service,
+            auth_token=credentials.credentials  # 토큰 전달
         )
         return result
     except Exception as e:
@@ -34,7 +37,8 @@ async def search_documents(
 @router.post("/analyze")
 async def analyze_documents(
     request: SearchRequest,
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """문서 분석 API - 인증된 사용자만 사용 가능"""
     try:
@@ -52,7 +56,8 @@ async def analyze_documents(
             query=request.query, 
             report_numbers=report_numbers,
             user_id=str(current_user.id),
-            logger_service=logger_service
+            logger_service=logger_service,
+            auth_token=credentials.credentials  # 토큰 전달
         )
         
         return {

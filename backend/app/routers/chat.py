@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from ..services.analysis_service import AnalysisService
@@ -9,6 +10,8 @@ from app.dependencies import get_current_user
 import os
 import json
 from fastapi.responses import FileResponse
+
+security = HTTPBearer()
 
 class ChatPart(BaseModel):
     text: str
@@ -37,7 +40,8 @@ router = APIRouter()
 @router.post("/chat", response_model=ChatResponse)
 async def chat_with_report(
     request: ChatRequest,
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """보고서와 채팅 API - 캐시를 활용한 Gemini API 호출"""
     try:
@@ -69,7 +73,8 @@ async def chat_with_report(
             logger_service=logger_service,
             history=history_dict,
             is_hidden=request.is_hidden,
-            origin_query=request.origin_query
+            origin_query=request.origin_query,
+            auth_token=credentials.credentials  # 토큰 전달
         )
         
         return ChatResponse(

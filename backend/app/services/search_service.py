@@ -174,7 +174,7 @@ class SearchService:
         return _embedding_model, _vectorstore
     
     @staticmethod
-    async def analyze_user_query(original_query: str, user_id: str, logger_service: Optional[LoggerService] = None, is_hidden: bool = False) -> Tuple[str, List[str], List[str], Dict, str, Dict]:
+    async def analyze_user_query(original_query: str, user_id: str, logger_service: Optional[LoggerService] = None, is_hidden: bool = False, auth_token: Optional[str] = None) -> Tuple[str, List[str], List[str], Dict, str, Dict]:
         """사용자 쿼리를 분석하여 요약 쿼리, 우선순위 섹션, 키워드, 메타데이터 필터, 의도, 사용량 메타데이터를 반환"""
         generation_config = {
             "max_output_tokens": int(os.getenv("GEMINI_MAX_TOKENS", "2048")),
@@ -239,7 +239,8 @@ class SearchService:
                         request_token_count=usage_metadata.get('prompt_token_count', 0),
                         response_token_count=usage_metadata.get('candidates_token_count', 0),
                         total_token_count=usage_metadata.get('total_token_count', 0),
-                        is_hidden=is_hidden
+                        is_hidden=is_hidden,
+                        auth_token=auth_token  # 토큰 전달
                     )
                 except Exception as log_error:
                     print(f"❌ 로깅 중 오류: {log_error}")
@@ -347,7 +348,7 @@ class SearchService:
         return reranked_results
     
     @staticmethod
-    async def search_documents(query: str, k: int = 10, user_id: Optional[str] = None, logger_service: Optional[LoggerService] = None, is_hidden: bool = False) -> Dict[str, Any]:
+    async def search_documents(query: str, k: int = 10, user_id: Optional[str] = None, logger_service: Optional[LoggerService] = None, is_hidden: bool = False, auth_token: Optional[str] = None) -> Dict[str, Any]:
         """문서 검색 처리"""
         try:
             print(f"🔍 검색 요청 받음: {query}")
@@ -363,7 +364,7 @@ class SearchService:
 
             print(f"🧠 쿼리 분석 시작...")
             # 쿼리 분석
-            summary_query, priority_sections, keyword_terms, metadata_filters, usage_metadata = await SearchService.analyze_user_query(query, user_id, logger_service, is_hidden)
+            summary_query, priority_sections, keyword_terms, metadata_filters, usage_metadata = await SearchService.analyze_user_query(query, user_id, logger_service, is_hidden, auth_token)
             print(f"✅ 쿼리 분석 완료: {summary_query}")
             # print(f"🎯 쿼리 의도: {intent if intent else '분석 불가'}")
             

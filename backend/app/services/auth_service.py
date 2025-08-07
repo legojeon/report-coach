@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 from app.models.user import User
-from app.supabase_client import supabase
+from app.supabase_client import get_client
 import os
 from dotenv import load_dotenv
 import logging
@@ -22,6 +22,9 @@ class AuthService:
         Supabase Auth를 사용한 로그인
         """
         try:
+            # 기본 클라이언트 사용
+            supabase = get_client()
+            
             # Supabase Auth로 로그인
             response = supabase.auth.sign_in_with_password({
                 "email": email,
@@ -73,6 +76,9 @@ class AuthService:
         """
         try:
             logger.info(f"Starting registration for email: {email}")
+            
+            # 기본 클라이언트 사용
+            supabase = get_client()
             
             # Supabase Auth로 회원가입
             logger.info("Calling Supabase auth.sign_up...")
@@ -137,6 +143,9 @@ class AuthService:
         토큰으로 현재 사용자 정보 조회
         """
         try:
+            # 인증된 클라이언트 사용
+            supabase = get_client(token)
+            
             # Supabase Auth로 사용자 정보 조회
             user = supabase.auth.get_user(token)
             
@@ -169,6 +178,8 @@ class AuthService:
         리프레시 토큰으로 새로운 액세스 토큰 발급
         """
         try:
+            # 기본 클라이언트 사용
+            supabase = get_client()
             response = supabase.auth.refresh_session(refresh_token)
             return {
                 "access_token": response.session.access_token,
@@ -183,6 +194,8 @@ class AuthService:
         로그아웃
         """
         try:
+            # 기본 클라이언트 사용
+            supabase = get_client()
             supabase.auth.sign_out()
             return {"message": "Successfully logged out"}
         except Exception as e:

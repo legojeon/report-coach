@@ -2,20 +2,26 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import Optional, Dict, Any, List
 from datetime import datetime, date
 from app.dependencies import get_current_user
-from app.supabase_client import supabase
+from app.supabase_client import get_client
 from app.models.user import User
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 router = APIRouter()
+security = HTTPBearer()
 
 @router.get("/ai-usage")
 async def get_ai_usage(
     current_user: User = Depends(get_current_user),
     service_name: Optional[str] = Query(None, description="서비스 이름 (query_summary, analyze_reports, chat_report)"),
     start_date: Optional[date] = Query(None, description="시작 날짜 (YYYY-MM-DD)"),
-    end_date: Optional[date] = Query(None, description="종료 날짜 (YYYY-MM-DD)")
+    end_date: Optional[date] = Query(None, description="종료 날짜 (YYYY-MM-DD)"),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> Dict[str, Any]:
     """사용자의 AI 토큰 사용량 조회"""
     try:
+        # 독립적인 클라이언트 사용
+        supabase = get_client(credentials.credentials)
+        
         # 기본 쿼리
         query = supabase.table("ai_usage_logs").select("*").eq("user_id", current_user.id)
         
@@ -93,10 +99,14 @@ async def get_ai_usage(
 @router.get("/history")
 async def get_user_history(
     current_user: User = Depends(get_current_user),
-    service_type: Optional[str] = Query(None, description="서비스 타입 (search, chat, all)")
+    service_type: Optional[str] = Query(None, description="서비스 타입 (search, chat, all)"),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> Dict[str, Any]:
     """사용자의 검색/채팅 기록 조회"""
     try:
+        # 독립적인 클라이언트 사용
+        supabase = get_client(credentials.credentials)
+        
         # 기본 쿼리 - is_hidden이 false인 것만 조회
         query = supabase.table("ai_usage_logs").select("*").eq("user_id", current_user.id).eq("is_hidden", False)
         

@@ -103,7 +103,7 @@ class ChatService:
             return ""
 
     @staticmethod
-    async def chat_with_gemini(report_number: str, query: str, user_id: Optional[str] = None, logger_service: Optional[LoggerService] = None, session_id: Optional[str] = None, history: Optional[list] = None, is_hidden: bool = False, origin_query: Optional[str] = None):
+    async def chat_with_gemini(report_number: str, query: str, user_id: Optional[str] = None, logger_service: Optional[LoggerService] = None, session_id: Optional[str] = None, history: Optional[list] = None, is_hidden: bool = False, origin_query: Optional[str] = None, auth_token: Optional[str] = None):
         model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash-001")
         print(f"[CHAT] 모델: {model_name}")
         print(f"[CHAT] report_number: {report_number}")
@@ -180,7 +180,8 @@ class ChatService:
                         total_token_count=usage_metadata.get('total_token_count', 0),
                         session_id=log_session_id,
                         nttsn=nttsn,
-                        is_hidden=is_hidden
+                        is_hidden=is_hidden,
+                        auth_token=auth_token  # 토큰 전달
                     )
                     print(f"✅ 세션 ID로 로깅: {log_session_id} (from {session_string}), nttSn: {nttsn}, is_hidden: {is_hidden}")
                 except Exception as log_error:
